@@ -14,8 +14,11 @@ hhmm1 is the start time for the peak period when you want to sell to the grid.  
 hhmm2 is the end time for the peak sell period.
 
 p1 = the price you pay to import (buy) from the grid, outside of the peak period
+
 p2 = the price you pay to export (sell) to the grid, outside the peak
+
 p3 = the price you pay to import (buy) from the grid during the peak period.
+
 p4 = the price you pay to export (sell) to the grid during the peak period.
 
 example:
