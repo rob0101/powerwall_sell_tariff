@@ -1,0 +1,85 @@
+#!/opt/homebrew/bin/python3
+
+# I'm not a python programmer, so expect to see some ugly code  :-)
+# this is a bit of a proof of concept to customise Tesla Powerwall tariff's on the fly.
+
+# example usage:    pw_forced_sell 1710 1845 10 -5 50 40
+
+
+import json
+import sys
+import re
+
+def set_off_on_off_tariff_pattern(hhmm1,hhmm2):
+    h1 = re.sub("^0", "", hhmm1[0:2])
+    m1 = re.sub("^0", "", hhmm1[2:4])
+    h2 = re.sub("^0", "", hhmm2[0:2])
+    m2 = re.sub("^0", "", hhmm2[2:4])
+
+    j = """
+            {
+                "OFF_PEAK": [
+                    {
+                        "fromDayOfWeek": 0,
+                        "toDayOfWeek": 6,
+                        "fromHour": """ + h2 + """,
+                        "fromMinute": """ + m2 + """,
+                        "toHour": """ + h1 + """,
+                        "toMinute": """ + m1 + """
+                    }
+                ],
+                "ON_PEAK": [
+                    {
+                        "fromDayOfWeek": 0,
+                        "toDayOfWeek": 6,
+                        "fromHour": """ + h1+""",
+                        "fromMinute": """ + m1+""",
+                        "toHour": """ + h2+""",
+                        "toMinute": """ + m2 +"""
+                    }
+                ]
+            }
+        """
+
+    #print(j)
+    return json.loads(j)
+
+#############################################
+
+if len(sys.argv)<7:
+    print("Usage: pw_forced_sell hhmm1 hhmm2 p1 p2 p3 p4\nhhmm1 is start time in hhmm format, hhmm2 is the end time,\np1=default buy price, p2=default sell price, p3=spike buy price, p4=spike SELL price")  
+    exit()
+
+schedule = set_off_on_off_tariff_pattern(sys.argv[1],sys.argv[2])
+#print(schedule)
+import teslapy
+from teslapy import Tesla, Battery
+with teslapy.Tesla('elon@tesla.com') as tesla:
+    batteries = tesla.battery_list()
+    battery = batteries[0]
+
+    tariff = battery.get_tariff()
+
+    #print("OFF_PEAK:" + str(tariff["energy_charges"]["Summer"]["OFF_PEAK"]) + " and " + str(tariff["sell_tariff"]["energy_charges"]["Summer"]["OFF_PEAK"]))
+    #print("ON_PEAK:" + str(tariff["energy_charges"]["Summer"]["ON_PEAK"]) + " and " + str(tariff["sell_tariff"]["energy_charges"]["Summer"]["ON_PEAK"]))
+
+    tariff["seasons"]["Summer"]["tou_periods"] = schedule
+    tariff["sell_tariff"]["seasons"]["Summer"]["tou_periods"] = schedule
+
+    # ON_PEAK ---------------------------------------
+    tariff["energy_charges"]["Summer"]["ON_PEAK"] = round(float(sys.argv[5])/100,3)
+    tariff["sell_tariff"]["energy_charges"]["Summer"]["ON_PEAK"] = round(float(sys.argv[6])/100,3)
+
+    # OFF_PEAK ---------------------------------------
+    tariff["energy_charges"]["Summer"]["OFF_PEAK"] = round(float(sys.argv[3])/100,3)
+    tariff["sell_tariff"]["energy_charges"]["Summer"]["OFF_PEAK"] = round(float(sys.argv[4])/100,3)
+
+    tariff["name"] = "Custom via API"
+    tariff["utility"] = "Amber"
+
+    battery.set_tariff(tariff)
+
+    #print("===============")
+
+    #print("OFF_PEAK:" + str(tariff["energy_charges"]["Summer"]["OFF_PEAK"]*100) + "c and " + str(tariff["sell_tariff"]["energy_charges"]["Summer"]["OFF_PEAK"]*100)+"c")
+    #print("ON_PEAK:" + str(tariff["energy_charges"]["Summer"]["ON_PEAK"]*100) + "c and " + str(tariff["sell_tariff"]["energy_charges"]["Summer"]["ON_PEAK"]*100)+"c")
