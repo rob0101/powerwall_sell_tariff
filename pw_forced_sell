@@ -1,5 +1,7 @@
 #!/opt/homebrew/bin/python3
 
+# Use this code at your own risk. It's released as a proof of concept only.  No guarantees it won't do harm.
+
 # I'm not a python programmer, so expect to see some ugly code  :-)
 # this is a bit of a proof of concept to customise Tesla Powerwall tariff's on the fly.
 
