@@ -23,7 +23,7 @@ p4 = the price you pay to export (sell) to the grid during the peak period.
 
 example:
 
-powerwall_sell_tariff 1710 1835 10 -5 60 50
+pw_forced_sell 1710 1835 10 -5 60 50
 
 The peak period is 1710 to 1835  (5:10pm to 6:35pm)
 The offpeak buying price is 10 cents
