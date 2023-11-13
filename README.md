@@ -1,4 +1,4 @@
-# powerwall_sell_tariff
+# pw_forced_sell
 script to set a tariff in the Tesla Powerwall setting that has a time period when you want to export power
 
 Customer's of Amber Electricity in Australia may find this useful to automate times the battery can be forced to sell.
