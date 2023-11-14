@@ -2,6 +2,8 @@
 
 Caveat: use at your own risk, this is just a proof of concept to get some working code out in the wild.
 
+Caveat 2: after changing the tariff settings, it may take many minutes for the TBC behaviour to change due to Tesla not reacting to these changes in real time. Try to plan at least 15 minutes ahead of when you want something to happen.
+
 script to set a tariff in the Tesla Powerwall setting that has a time period when you want to export power
 
 Customer's of Amber Electricity in Australia may find this useful to automate times the battery can be forced to sell.
